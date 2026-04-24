@@ -9,16 +9,14 @@ pipeline:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
-        variables:
-          - name: HARNESS_CI_INTERNAL_ROUTE_TO_RUNNER
-            type: String
-            value: "true"
         spec:
           infrastructure:
-            type: Local
+            type: VM
             spec:
-              os: MacOS
-              arch: Arm64
+              type: Pool
+              spec:
+                poolName: macos-pool
+                os: MacOS
           execution:
             steps:
               - step:
