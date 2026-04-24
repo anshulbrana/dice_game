@@ -1,6 +1,6 @@
 pipeline:
-  name: "Build iOS IPA"
-  identifier: "Build_iOS_IPA"
+  name: "Feature"
+  identifier: "Build_FEATURE"
   projectIdentifier: "dice_game"
   orgIdentifier: "default"
   tags: []
