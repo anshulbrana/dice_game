@@ -1,89 +1,54 @@
 pipeline:
-  name: "feature"
-  identifier: "feature"
-  projectIdentifier: "flutter_app"
-  orgIdentifier: "default"
+  name: feature
+  identifier: feature
+  projectIdentifier: flutter_app
+  orgIdentifier: default
   tags: {}
   stages:
     - stage:
-        name: "Build iOS IPA"
-        identifier: "Build_iOS_IPA"
-        type: "CI"
+        name: Build iOS IPA
+        identifier: Build_iOS_IPA
+        type: CI
+        variables:
+          - name: HARNESS_CI_INTERNAL_ROUTE_TO_RUNNER
+            type: String
+            value: "true"
         spec:
-          delegateSelectors:
-            - "self-hosted-agent"
           infrastructure:
-            type: Docker
-            spec: {}
+            type: Local
+            spec:
+              os: MacOS
+              arch: Arm64
           execution:
             steps:
               - step:
-                  name: "Checkout"
-                  identifier: "Checkout"
-                  type: "GitClone"
+                  name: Checkout
+                  identifier: Checkout
+                  type: GitClone
                   spec:
                     depth: 1
-
-              # - step:
-              #     name: "Install Flutter SDK"
-              #     identifier: "Install_Flutter_SDK"
-              #     type: "ShellScript"
-              #     spec:
-              #       shell: "Bash"
-              #       source:
-              #         type: "Inline"
-              #         spec:
-              #           script: |
-              #             set -e
-              #             if ! command -v flutter >/dev/null 2>&1; then
-              #               echo "Installing Flutter SDK..."
-              #               git clone https://github.com/flutter/flutter.git -b stable "$HOME/flutter"
-              #             fi
-              #             export PATH="$HOME/flutter/bin:$PATH"
-              #             flutter --version
-
-              # - step:
-              #     name: "Install dependencies"
-              #     identifier: "Install_Dependencies"
-              #     type: "ShellScript"
-              #     spec:
-              #       shell: "Bash"
-              #       source:
-              #         type: "Inline"
-              #         spec:
-              #           script: |
-              #             set -e
-              #             export PATH="$HOME/flutter/bin:$PATH"
-              #             flutter pub get
-              #             pushd ios
-              #             pod install --repo-update
-              #             popd
-
-              - step:
-                  name: "Build iOS IPA"
-                  identifier: "Build_iOS_IPA_Step"
-                  type: "ShellScript"
-                  spec:
-                    shell: "Bash"
-                    source:
-                      type: "Inline"
+                    build:
+                      type: branch
                       spec:
-                        script: |
-                          set -e
-                          export PATH="$HOME/flutter/bin:$PATH"
-                          flutter clean
-                          flutter build ipa --export-method app-store
-
+                        branch: <+codebase.branch>
               - step:
-                  name: "Collect IPA artifact"
-                  identifier: "Collect_IPA_Artifact"
-                  type: "ShellScript"
+                  name: Build iOS IPA
+                  identifier: Build_iOS_IPA_Step
+                  type: Run
                   spec:
-                    shell: "Bash"
-                    source:
-                      type: "Inline"
-                      spec:
-                        script: |
-                          set -e
-                          ls -al build/ios/ipa
-                          echo "IPA output directory contents listed above."
+                    shell: Bash
+                    command: |
+                      set -e
+                      export PATH="$HOME/flutter/bin:$PATH"
+                      flutter clean
+                      flutter build ipa --export-method app-store
+              - step:
+                  name: Collect IPA artifact
+                  identifier: Collect_IPA_Artifact
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      ls -al build/ios/ipa
+                      echo "IPA output directory contents listed above."
