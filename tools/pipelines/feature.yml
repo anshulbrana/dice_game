@@ -1,6 +1,6 @@
 pipeline:
   name: "Feature"
-  identifier: "Build_FEATURE"
+  identifier: "Feature"
   projectIdentifier: "dice_game"
   orgIdentifier: "default"
   tags: []
