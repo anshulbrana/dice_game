@@ -4,83 +4,83 @@ pipeline:
   projectIdentifier: "flutter_app"
   orgIdentifier: "default"
   tags: {}
-  stages:
-    - stage:
-        name: "Build iOS IPA"
-        identifier: "Build_iOS_IPA"
-        type: "CI"
-        spec:
-          delegateSelectors:
-            - "docker-delegate"
-          execution:
-            steps:
-              - step:
-                  name: "Checkout"
-                  identifier: "Checkout"
-                  type: "GitClone"
-                  spec:
-                    depth: 1
+  # stages:
+  #   - stage:
+  #       name: "Build iOS IPA"
+  #       identifier: "Build_iOS_IPA"
+  #       type: "CI"
+  #       spec:
+  #         delegateSelectors:
+  #           - "docker-delegate"
+  #         execution:
+  #           steps:
+  #             - step:
+  #                 name: "Checkout"
+  #                 identifier: "Checkout"
+  #                 type: "GitClone"
+  #                 spec:
+  #                   depth: 1
 
-              - step:
-                  name: "Install Flutter SDK"
-                  identifier: "Install_Flutter_SDK"
-                  type: "ShellScript"
-                  spec:
-                    shell: "Bash"
-                    source:
-                      type: "Inline"
-                      spec:
-                        script: |
-                          set -e
-                          if ! command -v flutter >/dev/null 2>&1; then
-                            echo "Installing Flutter SDK..."
-                            git clone https://github.com/flutter/flutter.git -b stable "$HOME/flutter"
-                          fi
-                          export PATH="$HOME/flutter/bin:$PATH"
-                          flutter --version
+  #             - step:
+  #                 name: "Install Flutter SDK"
+  #                 identifier: "Install_Flutter_SDK"
+  #                 type: "ShellScript"
+  #                 spec:
+  #                   shell: "Bash"
+  #                   source:
+  #                     type: "Inline"
+  #                     spec:
+  #                       script: |
+  #                         set -e
+  #                         if ! command -v flutter >/dev/null 2>&1; then
+  #                           echo "Installing Flutter SDK..."
+  #                           git clone https://github.com/flutter/flutter.git -b stable "$HOME/flutter"
+  #                         fi
+  #                         export PATH="$HOME/flutter/bin:$PATH"
+  #                         flutter --version
 
-              # - step:
-              #     name: "Install dependencies"
-              #     identifier: "Install_Dependencies"
-              #     type: "ShellScript"
-              #     spec:
-              #       shell: "Bash"
-              #       source:
-              #         type: "Inline"
-              #         spec:
-              #           script: |
-              #             set -e
-              #             export PATH="$HOME/flutter/bin:$PATH"
-              #             flutter pub get
-              #             pushd ios
-              #             pod install --repo-update
-              #             popd
+  #             # - step:
+  #             #     name: "Install dependencies"
+  #             #     identifier: "Install_Dependencies"
+  #             #     type: "ShellScript"
+  #             #     spec:
+  #             #       shell: "Bash"
+  #             #       source:
+  #             #         type: "Inline"
+  #             #         spec:
+  #             #           script: |
+  #             #             set -e
+  #             #             export PATH="$HOME/flutter/bin:$PATH"
+  #             #             flutter pub get
+  #             #             pushd ios
+  #             #             pod install --repo-update
+  #             #             popd
 
-              - step:
-                  name: "Build iOS IPA"
-                  identifier: "Build_iOS_IPA_Step"
-                  type: "ShellScript"
-                  spec:
-                    shell: "Bash"
-                    source:
-                      type: "Inline"
-                      spec:
-                        script: |
-                          set -e
-                          export PATH="$HOME/flutter/bin:$PATH"
-                          flutter clean
-                          flutter build ipa --export-method app-store
+  #             - step:
+  #                 name: "Build iOS IPA"
+  #                 identifier: "Build_iOS_IPA_Step"
+  #                 type: "ShellScript"
+  #                 spec:
+  #                   shell: "Bash"
+  #                   source:
+  #                     type: "Inline"
+  #                     spec:
+  #                       script: |
+  #                         set -e
+  #                         export PATH="$HOME/flutter/bin:$PATH"
+  #                         flutter clean
+  #                         flutter build ipa --export-method app-store
 
-              - step:
-                  name: "Collect IPA artifact"
-                  identifier: "Collect_IPA_Artifact"
-                  type: "ShellScript"
-                  spec:
-                    shell: "Bash"
-                    source:
-                      type: "Inline"
-                      spec:
-                        script: |
-                          set -e
-                          ls -al build/ios/ipa
-                          echo "IPA output directory contents listed above."
+  #             - step:
+  #                 name: "Collect IPA artifact"
+  #                 identifier: "Collect_IPA_Artifact"
+  #                 type: "ShellScript"
+  #                 spec:
+  #                   shell: "Bash"
+  #                   source:
+  #                     type: "Inline"
+  #                     spec:
+  #                       script: |
+  #                         set -e
+  #                         ls -al build/ios/ipa
+  #                         echo "IPA output directory contents listed above."
