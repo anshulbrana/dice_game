@@ -4,6 +4,12 @@ pipeline:
   projectIdentifier: flutter_app
   orgIdentifier: default
   tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: FlutterApplication
+        repoName: GlobalAppV2
+        build: <+input>
   stages:
     - stage:
         name: Build iOS IPA
