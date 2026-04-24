@@ -11,7 +11,10 @@ pipeline:
         type: "CI"
         spec:
           delegateSelectors:
-            - "docker-delegate"
+            - "self-hosted-agent"
+          infrastructure:
+            type: Docker
+            spec: {}
           execution:
             steps:
               - step:
