@@ -4,55 +4,35 @@ pipeline:
   projectIdentifier: flutter_app
   orgIdentifier: default
   tags: {}
-  properties:
-    ci:
-      codebase:
-        connectorRef: account.FlutterApplication
-        repoName: GlobalAppV2
-        build: <+input>
   stages:
     - stage:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
-        type: CI
+        type: Custom
         spec:
-          infrastructure:
-            type: VM
-            spec:
-              type: Pool
-              spec:
-                poolName: macos-pool
-                os: MacOS
           execution:
             steps:
               - step:
-                  name: Checkout
-                  identifier: Checkout
-                  type: GitClone
-                  spec:
-                    depth: 1
-                    build:
-                      type: branch
-                      spec:
-                        branch: <+codebase.branch>
-              - step:
                   name: Build iOS IPA
                   identifier: Build_iOS_IPA_Step
-                  type: Run
+                  type: ShellScript
                   spec:
                     shell: Bash
-                    command: |
-                      set -e
-                      export PATH="$HOME/flutter/bin:$PATH"
-                      flutter clean
-                      flutter build ipa --export-method app-store
-              - step:
-                  name: Collect IPA artifact
-                  identifier: Collect_IPA_Artifact
-                  type: Run
-                  spec:
-                    shell: Bash
-                    command: |
-                      set -e
-                      ls -al build/ios/ipa
-                      echo "IPA output directory contents listed above."
+                    onDelegate: true
+                    source:
+                      type: Inline
+                      spec:
+                        script: |
+                          set -e
+                          cd <+pipeline.variables.workspace>
+                          export PATH="$HOME/flutter/bin:$PATH"
+                          git clone <+codebase.repoUrl> app
+                          cd app
+                          git checkout <+codebase.branch>
+                          cd src
+                          flutter clean
+                          flutter build ipa --export-method app-store
+                          ls -al build/ios/ipa
+                  timeout: 60m
+        delegateSelectors:
+          - self-hosted-agent
