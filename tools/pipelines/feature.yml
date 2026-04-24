@@ -4,22 +4,22 @@ pipeline:
   projectIdentifier: "flutter_app"
   orgIdentifier: "default"
   tags: {}
-  # stages:
-  #   - stage:
-  #       name: "Build iOS IPA"
-  #       identifier: "Build_iOS_IPA"
-  #       type: "CI"
-  #       spec:
-  #         delegateSelectors:
-  #           - "docker-delegate"
-  #         execution:
-  #           steps:
-  #             - step:
-  #                 name: "Checkout"
-  #                 identifier: "Checkout"
-  #                 type: "GitClone"
-  #                 spec:
-  #                   depth: 1
+  stages:
+    - stage:
+        name: "Build iOS IPA"
+        identifier: "Build_iOS_IPA"
+        type: "CI"
+        spec:
+          delegateSelectors:
+            - "docker-delegate"
+          execution:
+            steps:
+              - step:
+                  name: "Checkout"
+                  identifier: "Checkout"
+                  type: "GitClone"
+                  spec:
+                    depth: 1
 
   #             - step:
   #                 name: "Install Flutter SDK"
