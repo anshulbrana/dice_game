@@ -1,9 +1,9 @@
 pipeline:
-  name: "Feature_OLD"
-  identifier: "Feature_OLD"
+  name: "feature"
+  identifier: "feature"
   projectIdentifier: "flutter_app"
   orgIdentifier: "default"
-  tags: []
+  tags: {}
   stages:
     - stage:
         name: "Build iOS IPA"
