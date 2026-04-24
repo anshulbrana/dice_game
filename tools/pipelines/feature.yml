@@ -1,7 +1,7 @@
 pipeline:
   name: "Feature"
   identifier: "Feature"
-  projectIdentifier: "dice_game"
+  projectIdentifier: "flutter_app"
   orgIdentifier: "default"
   tags: []
   stages:
