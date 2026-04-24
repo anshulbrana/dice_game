@@ -1,6 +1,6 @@
 pipeline:
-  name: "Feature"
-  identifier: "Feature"
+  name: "Feature_OLD"
+  identifier: "Feature_OLD"
   projectIdentifier: "flutter_app"
   orgIdentifier: "default"
   tags: []
