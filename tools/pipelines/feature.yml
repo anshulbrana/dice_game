@@ -66,17 +66,17 @@ pipeline:
                       export PATH="$HOME/flutter/bin:$PATH"
                       flutter clean
                       flutter build ipa --export-method app-store
-              - step:
-                  name: Collect IPA artifact
-                  identifier: Collect_IPA_Artifact
-                  type: Run
+
+                - step:
+                  name: Publish IPA Artifact
+                  identifier: Publish_IPA_Artifact
+                  type: Artifact
                   spec:
-                    shell: Bash
-                    command: |
-                      set -e
-                      cd src
-                      ls -al build/ios/ipa
-                      echo "IPA output directory contents listed above."
+                    artifactType: BuildArtifact
+                    spec:
+                      sourcePath: src/build/ios/ipa/dice_game.ipa
+                      artifactName: dice_game-release.ipa
+
     - stage:
         name: Build Android AAB
         identifier: Build_Android_AAB
@@ -101,40 +101,33 @@ pipeline:
           execution:
             steps:
               - step:
+                  name: Flutter clean
+                  identifier: Clean_Build
+                  type: Run
+                  spec:
+                    shell: Bash
+                    workingDirectory: src
+                    command: |
+                      set -e
+                      flutter clean
+
+              - step:
                   name: Build Android AAB
                   identifier: Build_Android_AAB_Step
                   type: Run
                   spec:
                     shell: Bash
+                    workingDirectory: src
                     command: |
                       set -e
-                      export PATH="$HOME/flutter/bin:$PATH"
-
-                      # Force Temurin 17 — Flutter must NOT use Android Studio's Java 21
-                      export JAVA_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home"
-                      export PATH="$JAVA_HOME/bin:$PATH"
-                      echo "JAVA_HOME set to: $JAVA_HOME"
-                      java -version
-
-                      # Tell Flutter explicitly to use Java 17
-                      flutter config --jdk-dir="$JAVA_HOME"
-
-                      # Clear corrupt Gradle 7.4 cache (incompatible with Java 21 artifacts)
-                      rm -rf "$HOME/.gradle/caches/7.4"
-                      echo "Cleared Gradle 7.4 cache"
-
-                      cd src
-
-                      flutter clean
                       flutter build appbundle --release
+
               - step:
-                  name: Collect AAB artifact
-                  identifier: Collect_AAB_Artifact
-                  type: Run
+                  name: Publish AAB Artifact
+                  identifier: Publish_AAB_Artifact
+                  type: Artifact
                   spec:
-                    shell: Bash
-                    command: |
-                      set -e
-                      cd src
-                      ls -al build/app/outputs/bundle/release
-                      echo "AAB output directory contents listed above."
+                    artifactType: BuildArtifact
+                    spec:
+                      sourcePath: src/build/app/outputs/bundle/release/app-release.aab
+                      artifactName: dice_game-release.aab
