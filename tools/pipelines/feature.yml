@@ -146,4 +146,3 @@ pipeline:
                       ls -lh dice_game.aab
                   artifactPaths:
                     - dice_game.aab
-                      - src/build/app/outputs/bundle/release/*.aab
