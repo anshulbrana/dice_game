@@ -35,7 +35,15 @@ pipeline:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
-        when: <+pipeline.variables.buildIOS> == "true"
+        when:
+          pipelineStatus: All
+          condition: <+pipeline.variables.buildIOS> == "true"
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: Abort
         spec:
           cloneCodebase: true
           platform:
@@ -71,7 +79,15 @@ pipeline:
         name: Build Android AAB
         identifier: Build_Android_AAB
         type: CI
-        when: <+pipeline.variables.buildGoogle> == "true"
+        when:
+          pipelineStatus: All
+          condition: <+pipeline.variables.buildGoogle> == "true"
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: Abort
         spec:
           cloneCodebase: true
           platform:
