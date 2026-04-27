@@ -62,6 +62,7 @@ pipeline:
                     shell: Bash
                     command: |
                       set -e
+                      cd src
                       export PATH="$HOME/flutter/bin:$PATH"
                       flutter clean
                       flutter build ipa --export-method app-store
@@ -73,6 +74,7 @@ pipeline:
                     shell: Bash
                     command: |
                       set -e
+                      cd src
                       ls -al build/ios/ipa
                       echo "IPA output directory contents listed above."
     - stage:
@@ -108,7 +110,7 @@ pipeline:
                       set -e
                       export PATH="$HOME/flutter/bin:$PATH"
 
-                      # Flutter uses Android Studio JDK (Java 21) by default — force Temurin 17
+                      # Force Temurin 17 — Flutter must NOT use Android Studio's Java 21
                       export JAVA_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home"
                       export PATH="$JAVA_HOME/bin:$PATH"
                       echo "JAVA_HOME set to: $JAVA_HOME"
@@ -121,6 +123,8 @@ pipeline:
                       rm -rf "$HOME/.gradle/caches/7.4"
                       echo "Cleared Gradle 7.4 cache"
 
+                      cd src
+
                       flutter clean
                       flutter build appbundle --release
               - step:
@@ -131,5 +135,6 @@ pipeline:
                     shell: Bash
                     command: |
                       set -e
+                      cd src
                       ls -al build/app/outputs/bundle/release
                       echo "AAB output directory contents listed above."
