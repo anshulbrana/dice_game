@@ -68,14 +68,14 @@ pipeline:
                       flutter build ipa --export-method app-store
 
               - step:
-                name: Publish IPA Artifact
-                identifier: Publish_IPA_Artifact
-                type: Artifact
-                spec:
-                  artifactType: BuildArtifact
+                  name: Publish IPA Artifact
+                  identifier: Publish_IPA_Artifact
+                  type: UploadArtifact
                   spec:
-                    sourcePath: src/build/ios/ipa/dice_game.ipa
-                    artifactName: dice_game-release.ipa
+                    artifactType: BuildArtifact
+                    spec:
+                      sourcePath: src/build/ios/ipa/dice_game.ipa
+                      artifactName: dice_game-release.ipa
 
     - stage:
         name: Build Android AAB
@@ -125,7 +125,7 @@ pipeline:
               - step:
                   name: Publish AAB Artifact
                   identifier: Publish_AAB_Artifact
-                  type: Artifact
+                  type: UploadArtifact
                   spec:
                     artifactType: BuildArtifact
                     spec:
