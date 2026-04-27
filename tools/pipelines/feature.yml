@@ -12,7 +12,7 @@ pipeline:
         build:
           type: branch
           spec:
-            branch: <+input>
+            branch: <+trigger.branch>
   stages:
     - stage:
         name: Build iOS IPA
