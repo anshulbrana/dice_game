@@ -13,6 +13,7 @@ pipeline:
       required: true
       spec:
         type: String
+
     - name: buildGoogle
       description: Build Android AAB for Google Play
       type: String
@@ -21,6 +22,7 @@ pipeline:
       required: true
       spec:
         type: String
+
   properties:
     ci:
       codebase:
@@ -30,6 +32,7 @@ pipeline:
           type: branch
           spec:
             branch: <+input>.default(main)
+
   stages:
     - stage:
         name: Build iOS IPA
@@ -75,11 +78,12 @@ pipeline:
                     shell: Bash
                     command: |
                       set -e
-                      IPA_PATH=$(find src/build/ios/ipa -name "*.ipa" | head -1)
-                      echo "IPA artifact: $IPA_PATH"
-                      ls -lh "$IPA_PATH"
-                    artifactPaths:
-                      - src/build/ios/ipa/*.ipa
+                      IPA_FILE=$(find src/build/ios/ipa -name "*.ipa" | head -1)
+                      echo "Found IPA: $IPA_FILE"
+                      cp "$IPA_FILE" dice_game.ipa
+                      ls -lh dice_game.ipa
+                  artifactPaths:
+                    - dice_game.ipa
 
     - stage:
         name: Build Android AAB
@@ -136,8 +140,10 @@ pipeline:
                     shell: Bash
                     command: |
                       set -e
-                      AAB_PATH=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
-                      echo "AAB artifact: $AAB_PATH"
-                      ls -lh "$AAB_PATH"
-                    artifactPaths:
+                      AAB_FILE=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
+                      echo "Found AAB: $AAB_FILE"
+                      cp "$AAB_FILE" dice_game.aab
+                      ls -lh dice_game.aab
+                  artifactPaths:
+                    - dice_game.aab
                       - src/build/app/outputs/bundle/release/*.aab
