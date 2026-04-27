@@ -1,8 +1,10 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
+
+def kotlin_version = '2.1.0'
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -23,6 +25,7 @@ if (flutterVersionName == null) {
 }
 
 android {
+    namespace "com.example.dice_game"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
