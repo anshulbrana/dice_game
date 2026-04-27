@@ -4,10 +4,6 @@ pipeline:
   projectIdentifier: flutter_app
   orgIdentifier: default
   tags: {}
-  variables:
-    - name: branch
-      type: String
-      value: <+input>
   properties:
     ci:
       codebase:
@@ -16,7 +12,7 @@ pipeline:
         build:
           type: branch
           spec:
-            branch: <+pipeline.variables.branch>
+            branch: <+input>
   stages:
     - stage:
         name: Build iOS IPA
