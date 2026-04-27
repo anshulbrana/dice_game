@@ -29,7 +29,7 @@ pipeline:
         build:
           type: branch
           spec:
-            branch: <+input>
+            branch: <+input>.default(main)
   stages:
     - stage:
         name: Build iOS IPA
