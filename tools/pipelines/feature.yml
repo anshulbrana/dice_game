@@ -110,9 +110,10 @@ pipeline:
                   type: Run
                   spec:
                     shell: Bash
-                    workingDirectory: src
                     command: |
                       set -e
+                      cd src
+                      export PATH="$HOME/flutter/bin:$PATH"
                       flutter clean
 
               - step:
@@ -121,9 +122,10 @@ pipeline:
                   type: Run
                   spec:
                     shell: Bash
-                    workingDirectory: src
                     command: |
                       set -e
+                      cd src
+                      export PATH="$HOME/flutter/bin:$PATH"
                       flutter build appbundle --release
 
               - step:
