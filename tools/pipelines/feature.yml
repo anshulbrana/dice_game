@@ -70,10 +70,16 @@ pipeline:
               - step:
                   name: Publish IPA Artifact
                   identifier: Publish_IPA_Artifact
-                  type: HarUpload
+                  type: Run
                   spec:
-                    sourcePath: src/build/ios/ipa/dice_game.ipa
-                    artifactName: dice_game-release.ipa
+                    shell: Bash
+                    command: |
+                      set -e
+                      IPA_PATH=$(find src/build/ios/ipa -name "*.ipa" | head -1)
+                      echo "IPA artifact: $IPA_PATH"
+                      ls -lh "$IPA_PATH"
+                  outputVariables:
+                    - name: IPA_PATH
 
     - stage:
         name: Build Android AAB
@@ -123,7 +129,13 @@ pipeline:
               - step:
                   name: Publish AAB Artifact
                   identifier: Publish_AAB_Artifact
-                  type: HarUpload
+                  type: Run
                   spec:
-                    sourcePath: src/build/app/outputs/bundle/release/app-release.aab
-                    artifactName: dice_game-release.aab
+                    shell: Bash
+                    command: |
+                      set -e
+                      AAB_PATH=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
+                      echo "AAB artifact: $AAB_PATH"
+                      ls -lh "$AAB_PATH"
+                  outputVariables:
+                    - name: AAB_PATH
