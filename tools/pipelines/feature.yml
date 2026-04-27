@@ -8,7 +8,7 @@ pipeline:
     ci:
       codebase:
         connectorRef: account.FlutterApplication
-        repoName: dice_game
+        repoName: GlobalAppV2
         build: <+input>
   stages:
     - stage:
@@ -19,10 +19,14 @@ pipeline:
           - macos-arm64
         spec:
           infrastructure:
-            type: Local
+            type: VM
             spec:
-              os: MacOS
-              arch: Arm64
+              platform:
+                os: MacOS
+                arch: Arm64
+              runtime:
+                type: Docker
+                spec: {}
           execution:
             steps:
               - step:
