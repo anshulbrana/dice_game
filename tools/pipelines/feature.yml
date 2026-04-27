@@ -8,6 +8,7 @@ pipeline:
     - name: buildIOS
       description: Build iOS IPA
       type: String
+      value: "false"
       default: "false"
       required: true
       spec:
@@ -15,7 +16,8 @@ pipeline:
     - name: buildGoogle
       description: Build Android AAB for Google Play
       type: String
-      default: "false"
+      value: "true"
+      default: "true"
       required: true
       spec:
         type: String
@@ -33,6 +35,7 @@ pipeline:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
+        pipelineStatus: Success
         when:
           condition: <+pipeline.variables.buildIOS> == "true"
         spec:
@@ -70,6 +73,7 @@ pipeline:
         name: Build Android AAB
         identifier: Build_Android_AAB
         type: CI
+        pipelineStatus: Success
         when:
           condition: <+pipeline.variables.buildGoogle> == "true"
         spec:
