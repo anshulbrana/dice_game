@@ -70,12 +70,10 @@ pipeline:
               - step:
                   name: Publish IPA Artifact
                   identifier: Publish_IPA_Artifact
-                  type: UploadArtifact
+                  type: HarUpload
                   spec:
-                    artifactType: BuildArtifact
-                    spec:
-                      sourcePath: src/build/ios/ipa/dice_game.ipa
-                      artifactName: dice_game-release.ipa
+                    sourcePath: src/build/ios/ipa/dice_game.ipa
+                    artifactName: dice_game-release.ipa
 
     - stage:
         name: Build Android AAB
@@ -125,9 +123,7 @@ pipeline:
               - step:
                   name: Publish AAB Artifact
                   identifier: Publish_AAB_Artifact
-                  type: UploadArtifact
+                  type: HarUpload
                   spec:
-                    artifactType: BuildArtifact
-                    spec:
-                      sourcePath: src/build/app/outputs/bundle/release/app-release.aab
-                      artifactName: dice_game-release.aab
+                    sourcePath: src/build/app/outputs/bundle/release/app-release.aab
+                    artifactName: dice_game-release.aab
