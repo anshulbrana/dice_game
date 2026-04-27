@@ -8,21 +8,21 @@ pipeline:
     ci:
       codebase:
         connectorRef: account.FlutterApplication
-        repoName: GlobalAppV2
+        repoName: dice_game
         build: <+input>
   stages:
     - stage:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
+        delegateSelectors:
+          - macos-arm64
         spec:
           infrastructure:
-            type: VM
+            type: Local
             spec:
-              type: Pool
-              spec:
-                poolName: macos-pool
-                os: MacOS
+              os: MacOS
+              arch: Arm64
           execution:
             steps:
               - step:
