@@ -35,9 +35,7 @@ pipeline:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
-        pipelineStatus: Success
-        when:
-          condition: <+pipeline.variables.buildIOS> == "true"
+        when: <+pipeline.variables.buildIOS> == "true"
         spec:
           cloneCodebase: true
           platform:
@@ -73,9 +71,7 @@ pipeline:
         name: Build Android AAB
         identifier: Build_Android_AAB
         type: CI
-        pipelineStatus: Success
-        when:
-          condition: <+pipeline.variables.buildGoogle> == "true"
+        when: <+pipeline.variables.buildGoogle> == "true"
         spec:
           cloneCodebase: true
           platform:
