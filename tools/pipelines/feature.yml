@@ -78,8 +78,8 @@ pipeline:
                       IPA_PATH=$(find src/build/ios/ipa -name "*.ipa" | head -1)
                       echo "IPA artifact: $IPA_PATH"
                       ls -lh "$IPA_PATH"
-                  outputVariables:
-                    - name: IPA_PATH
+                    artifactPaths:
+                      - src/build/ios/ipa/*.ipa
 
     - stage:
         name: Build Android AAB
@@ -139,5 +139,5 @@ pipeline:
                       AAB_PATH=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
                       echo "AAB artifact: $AAB_PATH"
                       ls -lh "$AAB_PATH"
-                  outputVariables:
-                    - name: AAB_PATH
+                    artifactPaths:
+                      - src/build/app/outputs/bundle/release/*.aab
