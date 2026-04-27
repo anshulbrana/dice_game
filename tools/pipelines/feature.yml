@@ -4,6 +4,21 @@ pipeline:
   projectIdentifier: flutter_app
   orgIdentifier: default
   tags: {}
+  variables:
+    - name: buildIOS
+      description: Build iOS IPA
+      type: String
+      default: "false"
+      required: true
+      spec:
+        type: String
+    - name: buildGoogle
+      description: Build Android AAB for Google Play
+      type: String
+      default: "false"
+      required: true
+      spec:
+        type: String
   properties:
     ci:
       codebase:
@@ -12,12 +27,14 @@ pipeline:
         build:
           type: branch
           spec:
-            branch: <+trigger.branch>
+            branch: <+input>
   stages:
     - stage:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
+        when:
+          condition: <+pipeline.variables.buildIOS> == "true"
         spec:
           cloneCodebase: true
           platform:
@@ -49,3 +66,40 @@ pipeline:
                       set -e
                       ls -al build/ios/ipa
                       echo "IPA output directory contents listed above."
+    - stage:
+        name: Build Android AAB
+        identifier: Build_Android_AAB
+        type: CI
+        when:
+          condition: <+pipeline.variables.buildGoogle> == "true"
+        spec:
+          cloneCodebase: true
+          platform:
+            os: MacOS
+            arch: Arm64
+          runtime:
+            type: Docker
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  name: Build Android AAB
+                  identifier: Build_Android_AAB_Step
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      export PATH="$HOME/flutter/bin:$PATH"
+                      flutter clean
+                      flutter build appbundle --release
+              - step:
+                  name: Collect AAB artifact
+                  identifier: Collect_AAB_Artifact
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      ls -al build/app/outputs/bundle/release
+                      echo "AAB output directory contents listed above."
