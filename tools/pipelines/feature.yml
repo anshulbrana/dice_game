@@ -107,6 +107,23 @@ pipeline:
                     command: |
                       set -e
                       export PATH="$HOME/flutter/bin:$PATH"
+
+                      # Java 21 is incompatible with Gradle 7.x — force Java 17
+                      if [ -d "/Library/Java/JavaVirtualMachines" ]; then
+                        JAVA17_HOME=$(ls -d /Library/Java/JavaVirtualMachines/*/Contents/Home 2>/dev/null | xargs -I{} sh -c 'echo $({}/bin/java -version 2>&1 | grep -q "version \"17" && echo {})' | head -1)
+                        if [ -n "$JAVA17_HOME" ]; then
+                          export JAVA_HOME="$JAVA17_HOME"
+                          echo "Using Java 17 at: $JAVA_HOME"
+                        fi
+                      fi
+
+                      # Also update Gradle wrapper to 8.4 which supports Java 21 if Java 17 not found
+                      GRADLE_PROPS="android/gradle/wrapper/gradle-wrapper.properties"
+                      if grep -q "gradle-7\." "$GRADLE_PROPS" 2>/dev/null; then
+                        sed -i '' 's|gradle-7\.[^/]*-bin\.zip|gradle-8.4-bin.zip|g' "$GRADLE_PROPS"
+                        echo "Updated Gradle to 8.4 for Java 21 compatibility"
+                      fi
+
                       flutter clean
                       flutter build appbundle --release
               - step:
