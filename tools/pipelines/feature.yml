@@ -15,8 +15,6 @@ pipeline:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
-        delegateSelectors:
-          - macos-arm64
         spec:
           platform:
             os: MacOS
