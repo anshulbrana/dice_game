@@ -9,13 +9,17 @@ pipeline:
       codebase:
         connectorRef: account.FlutterApplication
         repoName: dice_game
-        build: <+input>
+        build:
+          type: branch
+          spec:
+            branch: <+input>
   stages:
     - stage:
         name: Build iOS IPA
         identifier: Build_iOS_IPA
         type: CI
         spec:
+          cloneCodebase: true
           platform:
             os: MacOS
             arch: Arm64
@@ -24,16 +28,6 @@ pipeline:
             spec: {}
           execution:
             steps:
-              - step:
-                  name: Checkout
-                  identifier: Checkout
-                  type: GitClone
-                  spec:
-                    depth: 1
-                    build:
-                      type: branch
-                      spec:
-                        branch: <+codebase.branch>
               - step:
                   name: Build iOS IPA
                   identifier: Build_iOS_IPA_Step
