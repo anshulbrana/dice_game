@@ -61,8 +61,8 @@ fi
 UPLOAD_URL=$(echo "$RELEASE" | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'])" | sed 's/{.*//')
 echo "Upload URL: $UPLOAD_URL"
 
-# Upload artifact
-UPLOAD_RESPONSE=$(curl -s -X POST \
+# Upload artifact (300s timeout, show progress)
+UPLOAD_RESPONSE=$(curl -S --max-time 300 --retry 2 --retry-delay 5 -X POST \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Content-Type: application/octet-stream" \
   "${UPLOAD_URL}?name=${ARTIFACT_NAME}" \
