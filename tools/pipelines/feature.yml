@@ -1,0 +1,148 @@
+pipeline:
+  name: feature
+  identifier: feature
+  projectIdentifier: flutter_app
+  orgIdentifier: default
+  tags: {}
+  variables:
+    - name: buildIOS
+      description: Build iOS IPA
+      type: String
+      value: "false"
+      default: "false"
+      required: true
+      spec:
+        type: String
+
+    - name: buildGoogle
+      description: Build Android AAB for Google Play
+      type: String
+      value: "true"
+      default: "true"
+      required: true
+      spec:
+        type: String
+
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.FlutterApplication
+        repoName: dice_game
+        build:
+          type: branch
+          spec:
+            branch: <+input>.default(main)
+
+  stages:
+    - stage:
+        name: Build iOS IPA
+        identifier: Build_iOS_IPA
+        type: CI
+        when:
+          pipelineStatus: All
+          condition: <+pipeline.variables.buildIOS> == "true"
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: Abort
+        spec:
+          cloneCodebase: true
+          platform:
+            os: MacOS
+            arch: Arm64
+          runtime:
+            type: Docker
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  name: Build iOS IPA
+                  identifier: Build_iOS_IPA_Step
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      cd src
+                      export PATH="$HOME/flutter/bin:$PATH"
+                      flutter clean
+                      flutter build ipa --export-method app-store
+
+              - step:
+                  name: Publish IPA Artifact
+                  identifier: Publish_IPA_Artifact
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      IPA_FILE=$(find src/build/ios/ipa -name "*.ipa" | head -1)
+                      echo "Found IPA: $IPA_FILE"
+                      cp "$IPA_FILE" dice_game.ipa
+                      ls -lh dice_game.ipa
+                  artifactPaths:
+                    - dice_game.ipa
+
+    - stage:
+        name: Build Android AAB
+        identifier: Build_Android_AAB
+        type: CI
+        when:
+          pipelineStatus: All
+          condition: <+pipeline.variables.buildGoogle> == "true"
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: Abort
+        spec:
+          cloneCodebase: true
+          platform:
+            os: MacOS
+            arch: Arm64
+          runtime:
+            type: Docker
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  name: Flutter clean
+                  identifier: Clean_Build
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      cd src
+                      export PATH="$HOME/flutter/bin:$PATH"
+                      flutter clean
+
+              - step:
+                  name: Build Android AAB
+                  identifier: Build_Android_AAB_Step
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      cd src
+                      export PATH="$HOME/flutter/bin:$PATH"
+                      flutter build appbundle --release
+
+              - step:
+                  name: Publish AAB Artifact
+                  identifier: Publish_AAB_Artifact
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      set -e
+                      AAB_FILE=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
+                      echo "Found AAB: $AAB_FILE"
+                      cp "$AAB_FILE" dice_game.aab
+                      ls -lh dice_game.aab
+                  artifactPaths:
+                    - dice_game.aab

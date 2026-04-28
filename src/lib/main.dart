@@ -33,20 +33,22 @@ class _DicePageState extends State<DicePage> {
       child: Row(
         children: [
           Expanded(
-            child: FlatButton(
-              color: Colors.yellow,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.yellow,
+                padding: const EdgeInsets.all(16.0),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+              ),
               onPressed: () {
                 changeRightDice();
               },
-              padding: const EdgeInsets.all(16.0),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
               child: Image.asset('images/dice$leftDiceNumber.png'),
             ),
           ),
           Expanded(
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 changeLeftDice();
               },
