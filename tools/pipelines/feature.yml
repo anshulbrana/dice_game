@@ -76,14 +76,42 @@ pipeline:
                   type: Run
                   spec:
                     shell: Bash
-                    command: |
+                    envVariables:
+                      GITHUB_TOKEN: <+secrets.getValue("github_token")>
+                    command: |-
                       set -e
                       IPA_FILE=$(find src/build/ios/ipa -name "*.ipa" | head -1)
                       echo "Found IPA: $IPA_FILE"
-                      cp "$IPA_FILE" dice_game.ipa
-                      ls -lh dice_game.ipa
-                  artifactPaths:
-                    - dice_game.ipa
+
+                      REPO="dice_game"
+                      OWNER=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user | python3 -c "import sys,json; print(json.load(sys.stdin)['login'])")
+                      TAG="build-<+pipeline.sequenceId>"
+                      RELEASE_NAME="Build #<+pipeline.sequenceId> - <+pipeline.variables.branch>"
+
+                      # Create GitHub release
+                      RELEASE=$(curl -s -X POST \
+                        -H "Authorization: token $GITHUB_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        -d "{\"tag_name\":\"$TAG\",\"name\":\"$RELEASE_NAME\",\"draft\":false,\"prerelease\":true}" \
+                        "https://api.github.com/repos/$OWNER/$REPO/releases")
+
+                      UPLOAD_URL=$(echo "$RELEASE" | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'])" | sed 's/{.*//')
+                      echo "Upload URL: $UPLOAD_URL"
+
+                      # Upload IPA to the release
+                      DOWNLOAD_URL=$(curl -s -X POST \
+                        -H "Authorization: token $GITHUB_TOKEN" \
+                        -H "Content-Type: application/octet-stream" \
+                        "${UPLOAD_URL}?name=dice_game.ipa" \
+                        --data-binary @"$IPA_FILE" | python3 -c "import sys,json; print(json.load(sys.stdin)['browser_download_url'])")
+
+                      echo "IPA available at: $DOWNLOAD_URL"
+
+                      # Publish URL to Harness Artifacts tab
+                      curl -sL https://github.com/drone-plugins/artifact-metadata-publisher/releases/download/v2.2.0/artifact-metadata-publisher-darwin-arm64.zst -o amp.zst
+                      zstd -d amp.zst -o ./artifact-metadata-publisher
+                      chmod 700 ./artifact-metadata-publisher
+                      PLUGIN_FILE_URLS="dice_game.ipa:::$DOWNLOAD_URL" ./artifact-metadata-publisher
 
     - stage:
         name: Build Android AAB
@@ -138,11 +166,44 @@ pipeline:
                   type: Run
                   spec:
                     shell: Bash
-                    command: |
+                    envVariables:
+                      GITHUB_TOKEN: <+secrets.getValue("github_token")>
+                    command: |-
                       set -e
                       AAB_FILE=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
                       echo "Found AAB: $AAB_FILE"
-                      cp "$AAB_FILE" dice_game.aab
-                      ls -lh dice_game.aab
-                  artifactPaths:
-                    - dice_game.aab
+
+                      REPO="dice_game"
+                      OWNER=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user | python3 -c "import sys,json; print(json.load(sys.stdin)['login'])")
+                      TAG="build-<+pipeline.sequenceId>"
+
+                      # Get existing release by tag (created by iOS step or create new)
+                      RELEASE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                        "https://api.github.com/repos/$OWNER/$REPO/releases/tags/$TAG")
+                      RELEASE_ID=$(echo "$RELEASE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null)
+
+                      if [ -z "$RELEASE_ID" ]; then
+                        RELEASE=$(curl -s -X POST \
+                          -H "Authorization: token $GITHUB_TOKEN" \
+                          -H "Content-Type: application/json" \
+                          -d "{\"tag_name\":\"$TAG\",\"name\":\"Build #<+pipeline.sequenceId>\",\"draft\":false,\"prerelease\":true}" \
+                          "https://api.github.com/repos/$OWNER/$REPO/releases")
+                      fi
+
+                      UPLOAD_URL=$(echo "$RELEASE" | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'])" | sed 's/{.*//')
+
+                      # Upload AAB to the release
+                      DOWNLOAD_URL=$(curl -s -X POST \
+                        -H "Authorization: token $GITHUB_TOKEN" \
+                        -H "Content-Type: application/octet-stream" \
+                        "${UPLOAD_URL}?name=dice_game.aab" \
+                        --data-binary @"$AAB_FILE" | python3 -c "import sys,json; print(json.load(sys.stdin)['browser_download_url'])")
+
+                      echo "AAB available at: $DOWNLOAD_URL"
+
+                      # Publish URL to Harness Artifacts tab
+                      curl -sL https://github.com/drone-plugins/artifact-metadata-publisher/releases/download/v2.2.0/artifact-metadata-publisher-darwin-arm64.zst -o amp.zst
+                      zstd -d amp.zst -o ./artifact-metadata-publisher
+                      chmod 700 ./artifact-metadata-publisher
+                      PLUGIN_FILE_URLS="dice_game.aab:::$DOWNLOAD_URL" ./artifact-metadata-publisher
+
