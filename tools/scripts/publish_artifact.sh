@@ -80,4 +80,12 @@ if [ ! -x "$AMP" ]; then
   zstd -d "$AMP.zst" -o "$AMP"
   chmod 700 "$AMP"
 fi
+
+# Ensure the engine artifact directory exists (required by artifact-metadata-publisher)
+if [ -n "$PLUGIN_ARTIFACT_FILE" ]; then
+  mkdir -p "$(dirname "$PLUGIN_ARTIFACT_FILE")"
+else
+  mkdir -p /tmp/engine
+fi
+
 PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" "$AMP"
