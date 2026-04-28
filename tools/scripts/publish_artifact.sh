@@ -81,11 +81,10 @@ if [ ! -x "$AMP" ]; then
   chmod 700 "$AMP"
 fi
 
-# Ensure the engine artifact directory exists (required by artifact-metadata-publisher)
-if [ -n "$PLUGIN_ARTIFACT_FILE" ]; then
-  mkdir -p "$(dirname "$PLUGIN_ARTIFACT_FILE")"
-else
-  mkdir -p /tmp/engine
-fi
+# Ensure the engine artifact directory is writable (required by artifact-metadata-publisher)
+ENGINE_DIR="${PLUGIN_ARTIFACT_FILE:+$(dirname "$PLUGIN_ARTIFACT_FILE")}"
+ENGINE_DIR="${ENGINE_DIR:-/tmp/engine}"
+mkdir -p "$ENGINE_DIR" 2>/dev/null || true
+chmod 777 "$ENGINE_DIR" 2>/dev/null || true
 
 PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" "$AMP"
