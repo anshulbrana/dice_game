@@ -81,10 +81,11 @@ if [ ! -x "$AMP" ]; then
   chmod 700 "$AMP"
 fi
 
-# Ensure the engine artifact directory is writable (required by artifact-metadata-publisher)
-ENGINE_DIR="${PLUGIN_ARTIFACT_FILE:+$(dirname "$PLUGIN_ARTIFACT_FILE")}"
-ENGINE_DIR="${ENGINE_DIR:-/tmp/engine}"
-mkdir -p "$ENGINE_DIR" 2>/dev/null || true
-chmod 777 "$ENGINE_DIR" 2>/dev/null || true
+# Override artifact file path to a writable location (avoids /tmp/engine permission denied)
+ARTIFACT_TMP_FILE="$HOME/.cache/harness-tools/artifact-${ARTIFACT_NAME}-${TAG}"
+touch "$ARTIFACT_TMP_FILE"
 
-PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" "$AMP"
+PLUGIN_ARTIFACT_FILE="$ARTIFACT_TMP_FILE" \
+PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" \
+"$AMP" && echo "✅ Published to Harness Artifacts tab" || \
+  echo "⚠️  Harness Artifacts tab registration failed. Artifact still available at: $DOWNLOAD_URL"
