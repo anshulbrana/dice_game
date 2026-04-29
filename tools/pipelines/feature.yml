@@ -85,7 +85,7 @@ pipeline:
                       IPA_FILE=$(find src/build/ios/ipa -name "*.ipa" | head -1)
                       echo "Found IPA: $IPA_FILE"
                       GITHUB_REPO="dice_game" \
-                      bash tools/scripts/flutter/publish_artifact.sh \
+                      bash tools/scripts/publish_artifact.sh \
                         "$IPA_FILE" \
                         "dice_game.ipa" \
                         "build-<+pipeline.sequenceId>" \
@@ -153,7 +153,7 @@ pipeline:
                       AAB_FILE=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
                       echo "Found AAB: $AAB_FILE"
                       GITHUB_REPO="dice_game" \
-                      bash tools/scripts/flutter/publish_artifact.sh \
+                      bash tools/scripts/publish_artifact.sh \
                         "$AAB_FILE" \
                         "dice_game.aab" \
                         "build-<+pipeline.sequenceId>" \
