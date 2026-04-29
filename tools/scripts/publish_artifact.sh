@@ -72,20 +72,23 @@ echo "Upload response: $UPLOAD_RESPONSE"
 DOWNLOAD_URL=$(echo "$UPLOAD_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['browser_download_url'])")
 echo "✅ $ARTIFACT_NAME available at: $DOWNLOAD_URL"
 
-# Publish URL to Harness Artifacts tab (cached binary)
-AMP="$HOME/.cache/harness-tools/artifact-metadata-publisher"
-if [ ! -x "$AMP" ]; then
-  mkdir -p "$HOME/.cache/harness-tools"
-  curl -sL https://github.com/drone-plugins/artifact-metadata-publisher/releases/download/v2.2.0/artifact-metadata-publisher-darwin-arm64.zst -o "$AMP.zst"
-  zstd -d "$AMP.zst" -o "$AMP"
-  chmod 700 "$AMP"
+# Export as Harness output variable (visible in pipeline UI and usable by subsequent steps)
+# Format: https://developer.harness.io/docs/continuous-integration/use-ci/run-step-settings/#output-variables
+SANITIZED_NAME=$(echo "$ARTIFACT_NAME" | tr '.' '_')
+echo "DOWNLOAD_URL_${SANITIZED_NAME}=$DOWNLOAD_URL" >> "$DRONE_OUTPUT" 2>/dev/null || true
+
+# Publish to Harness Artifacts tab using the artifact-metadata-publisher binary
+# Required for hosted macOS runners (cannot use containerized Plugin step)
+# See: https://developer.harness.io/docs/continuous-integration/use-ci/build-and-upload-artifacts/artifacts-tab/#using-the-plugin-binary-on-hosted-macos-runners
+PUBLISHER_BINARY="./artifact-metadata-publisher"
+if [ ! -f "$PUBLISHER_BINARY" ]; then
+  echo "Downloading artifact-metadata-publisher binary..."
+  curl -sL https://github.com/drone-plugins/artifact-metadata-publisher/releases/download/v2.2.0/artifact-metadata-publisher-darwin-arm64.zst \
+    -o artifact-metadata-publisher-darwin-arm64.zst
+  zstd -d artifact-metadata-publisher-darwin-arm64.zst -o "$PUBLISHER_BINARY"
+  chmod 700 "$PUBLISHER_BINARY"
 fi
 
-# Override artifact file path to a writable location (avoids /tmp/engine permission denied)
-ARTIFACT_TMP_FILE="$HOME/.cache/harness-tools/artifact-${ARTIFACT_NAME}-${TAG}"
-touch "$ARTIFACT_TMP_FILE"
-
-PLUGIN_ARTIFACT_FILE="$ARTIFACT_TMP_FILE" \
-PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" \
-"$AMP" && echo "✅ Published to Harness Artifacts tab" || \
-  echo "⚠️  Harness Artifacts tab registration failed. Artifact still available at: $DOWNLOAD_URL"
+echo "Publishing to Harness Artifacts tab..."
+PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" "$PUBLISHER_BINARY"
+echo "✅ Published to Harness Artifacts tab"
