@@ -78,12 +78,14 @@ pipeline:
                     shell: Bash
                     envVariables:
                       GITHUB_TOKEN: <+secrets.getValue("github_token")>
+                    outputVariables:
+                      - name: DOWNLOAD_URL_dice_game_ipa
                     command: |-
                       set -e
                       IPA_FILE=$(find src/build/ios/ipa -name "*.ipa" | head -1)
                       echo "Found IPA: $IPA_FILE"
                       GITHUB_REPO="dice_game" \
-                      bash tools/scripts/publish_artifact.sh \
+                      bash tools/scripts/flutter/publish_artifact.sh \
                         "$IPA_FILE" \
                         "dice_game.ipa" \
                         "build-<+pipeline.sequenceId>" \
@@ -144,12 +146,14 @@ pipeline:
                     shell: Bash
                     envVariables:
                       GITHUB_TOKEN: <+secrets.getValue("github_token")>
+                    outputVariables:
+                      - name: DOWNLOAD_URL_dice_game_aab
                     command: |-
                       set -e
                       AAB_FILE=$(find src/build/app/outputs/bundle/release -name "*.aab" | head -1)
                       echo "Found AAB: $AAB_FILE"
                       GITHUB_REPO="dice_game" \
-                      bash tools/scripts/publish_artifact.sh \
+                      bash tools/scripts/flutter/publish_artifact.sh \
                         "$AAB_FILE" \
                         "dice_game.aab" \
                         "build-<+pipeline.sequenceId>" \
