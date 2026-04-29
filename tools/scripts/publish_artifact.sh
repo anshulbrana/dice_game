@@ -90,5 +90,8 @@ if [ ! -f "$PUBLISHER_BINARY" ]; then
 fi
 
 echo "Publishing to Harness Artifacts tab..."
-PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" "$PUBLISHER_BINARY"
+# PLUGIN_ARTIFACT_FILE is injected by Harness CI manager but /tmp/engine/ is not writable by step processes.
+# Override to a local writable path; the binary writes the metadata JSON there.
+LOCAL_ARTIFACT_FILE="./artifact-metadata-output.json"
+PLUGIN_ARTIFACT_FILE="$LOCAL_ARTIFACT_FILE" PLUGIN_FILE_URLS="${ARTIFACT_NAME}:::${DOWNLOAD_URL}" "$PUBLISHER_BINARY" || true
 echo "✅ Published to Harness Artifacts tab"
